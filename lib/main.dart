@@ -6,20 +6,8 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   try {
     await Firebase.initializeApp();
-  } catch (_) {
-    try {
-      await Firebase.initializeApp(
-        options: const FirebaseOptions(
-          apiKey: 'AIzaSyAVdhmHWGGJLB7HcxdS2nB8Y50SIU0wlek',
-          appId: '1:250945338922:android:cbf4974a93a9e8cdbe8d53',
-          messagingSenderId: '250945338922',
-          projectId: 'delta-ecommerce-ae4bc',
-          storageBucket: 'delta-ecommerce-ae4bc.firebasestorage.app',
-        ),
-      );
-    } catch (e) {
-      debugPrint('Erro ao inicializar Firebase: $e');
-    }
+  } catch (e) {
+    debugPrint('Erro ao inicializar Firebase: $e');
   }
 
   runApp(const MyApp());
