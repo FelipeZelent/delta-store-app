@@ -30,6 +30,7 @@ class _CartPageState extends State<CartPage> {
       return;
     }
     final c = await CouponsRepo.instance.getByCode(code);
+    if (!mounted) return;
     if (c == null) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Cupom inválido')));
       setState(() => appliedCoupon = null);
@@ -111,7 +112,7 @@ class _CartPageState extends State<CartPage> {
                       itemBuilder: (_, i) {
                         final it = items[i];
                         return Dismissible(
-                          key: Key('${it.product.id}-${it.size}-$i'),
+                          key: ValueKey('${it.product.categoryId}_${it.product.id}_${it.size}'),
                           onDismissed: (_) {
                             CartRepo.instance.remove(
                               uid: u.uid,
@@ -244,7 +245,26 @@ class _CartTile extends StatelessWidget {
       padding: const EdgeInsets.all(12),
       child: Row(
         children: [
-          ClipRRect(borderRadius: BorderRadius.circular(12), child: Image.network(p.imageUrl, width: 64, height: 64, fit: BoxFit.cover)),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: Image.network(
+              p.imageUrl,
+              width: 64,
+              height: 64,
+              fit: BoxFit.cover,
+              errorBuilder: (_, _, _) => Container(
+                width: 64,
+                height: 64,
+                color: const Color(0xFF25262B),
+                alignment: Alignment.center,
+                child: const Icon(
+                  Icons.image_not_supported_outlined,
+                  color: Colors.white54,
+                  size: 24,
+                ),
+              ),
+            ),
+          ),
           const SizedBox(width: 12),
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [

@@ -5,7 +5,7 @@ import 'product_repo.dart';
 class CartRepo {
   CartRepo._();
   static final instance = CartRepo._();
-  final _db = FirebaseFirestore.instance;
+  FirebaseFirestore get _db => FirebaseFirestore.instance;
 
   CollectionReference<Map<String, dynamic>> _col(String uid) =>
       _db.collection('users').doc(uid).collection('cart');
@@ -72,7 +72,8 @@ class CartRepo {
           final product = await ProductRepo.instance.getOne(cat, pid);
           return CartLine(product: product, size: size, qty: qty);
         });
-        return Future.wait(futures);
+        final lines = await Future.wait(futures);
+        return lines.where((l) => l.product.exists).toList();
       },
     );
   }

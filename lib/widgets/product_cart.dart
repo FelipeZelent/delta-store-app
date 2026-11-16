@@ -25,7 +25,18 @@ class ProductCard extends StatelessWidget {
                   child: Stack(
                     children: [
                       Positioned.fill(
-                        child: Image.network(product.imageUrl, fit: BoxFit.cover),
+                        child: Image.network(
+                          product.imageUrl,
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, _, _) => Container(
+                            color: const Color(0xFF25262B),
+                            alignment: Alignment.center,
+                            child: const Icon(
+                              Icons.image_not_supported_outlined,
+                              color: Colors.white54,
+                            ),
+                          ),
+                        ),
                       ),
                       Positioned(
                         left: 8,

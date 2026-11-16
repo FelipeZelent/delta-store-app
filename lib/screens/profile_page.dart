@@ -46,7 +46,7 @@ class ProfilePage extends StatelessWidget {
           );
         }
 
-        final name = (u!.displayName?.trim().isNotEmpty ?? false) ? u.displayName! : (u.email?.split('@').first ?? 'Usuário');
+        final name = (u.displayName?.trim().isNotEmpty ?? false) ? u.displayName! : (u.email?.split('@').first ?? 'Usuário');
         final email = u.email ?? '';
 
         return ListView(
@@ -134,7 +134,7 @@ class ProfilePage extends StatelessWidget {
 }
 
 class _SectionHeader extends StatelessWidget {
-  const _SectionHeader(this.title, {super.key});
+  const _SectionHeader(this.title);
   final String title;
 
   @override

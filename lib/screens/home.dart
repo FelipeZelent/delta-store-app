@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
 import 'home_page.dart';
 import 'cart_page.dart';
+import 'chat_page.dart';
 import 'login_page.dart';
 import 'profile_page.dart';
 
@@ -58,6 +59,15 @@ class _HomeState extends State<Home> {
             : Text(_titles[_selectedIndex]),
       ),
       body: IndexedStack(index: _selectedIndex, children: _pages),
+      floatingActionButton: FloatingActionButton(
+        tooltip: 'Assistente Delta',
+        onPressed: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => const ChatPage()),
+          );
+        },
+        child: const Icon(Icons.support_agent),
+      ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: _navigateBottomBar,

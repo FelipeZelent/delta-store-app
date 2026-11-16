@@ -1,6 +1,6 @@
 {
-    "name": "appstore",
-    "short_name": "appstore",
+    "name": "Delta Store",
+    "short_name": "Delta Store",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

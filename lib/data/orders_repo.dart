@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../models/product.dart';
 import 'cart_repo.dart';
 
 class OrderItem {
@@ -23,7 +22,7 @@ class OrderModel {
 class OrdersRepo {
   OrdersRepo._();
   static final instance = OrdersRepo._();
-  final _db = FirebaseFirestore.instance;
+  FirebaseFirestore get _db => FirebaseFirestore.instance;
 
   Stream<List<OrderModel>> streamByUser(String uid) {
     return _db

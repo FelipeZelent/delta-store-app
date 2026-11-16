@@ -47,7 +47,10 @@ class _LoginPageState extends State<LoginPage> {
         SnackBar(content: Text(isSignup ? 'Conta criada!' : 'Login ok')),
       );
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Erro: $e')));
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(AuthService.friendlyError(e))),
+      );
     } finally {
       if (mounted) setState(() => loading = false);
     }
@@ -68,7 +71,10 @@ class _LoginPageState extends State<LoginPage> {
         const SnackBar(content: Text('Enviamos um e-mail de recuperação')),
       );
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Erro: $e')));
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(AuthService.friendlyError(e))),
+      );
     }
   }
 

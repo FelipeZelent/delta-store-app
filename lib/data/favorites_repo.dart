@@ -5,7 +5,7 @@ import 'product_repo.dart';
 class FavoritesRepo {
   FavoritesRepo._();
   static final instance = FavoritesRepo._();
-  final _db = FirebaseFirestore.instance;
+  FirebaseFirestore get _db => FirebaseFirestore.instance;
 
   CollectionReference<Map<String, dynamic>> _col(String uid) =>
       _db.collection('users').doc(uid).collection('favorites');
@@ -39,7 +39,8 @@ class FavoritesRepo {
   Stream<List<Product>> streamProducts(String uid) {
     return streamKeys(uid).asyncMap((keys) async {
       final futures = keys.map((k) => ProductRepo.instance.getOne(k.category, k.pid));
-      return Future.wait(futures);
+      final products = await Future.wait(futures);
+      return products.where((p) => p.exists).toList();
     });
   }
 

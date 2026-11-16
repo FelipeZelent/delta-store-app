@@ -1,19 +1,23 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 
 class AuthService {
   AuthService._();
   static final instance = AuthService._();
 
-  final _auth = FirebaseAuth.instance;
-  final _db = FirebaseFirestore.instance;
+  bool get isFirebaseReady => Firebase.apps.isNotEmpty;
+  FirebaseAuth get _auth => FirebaseAuth.instance;
+  FirebaseFirestore get _db => FirebaseFirestore.instance;
 
   // ---- estado ----
-  Stream<User?> get authStateChanges => _auth.authStateChanges();
-  User? get currentUser => _auth.currentUser;
-  String? get uid => _auth.currentUser?.uid;
+  Stream<User?> get authStateChanges =>
+      isFirebaseReady ? _auth.userChanges() : Stream<User?>.value(null);
+  User? get currentUser => isFirebaseReady ? _auth.currentUser : null;
+  String? get uid => isFirebaseReady ? _auth.currentUser?.uid : null;
 
   Future<String> getOrCreateUid() async {
+    if (!isFirebaseReady) return 'guest';
     try {
       final u = _auth.currentUser ?? (await _auth.signInAnonymously()).user;
       return u!.uid;
@@ -22,30 +26,53 @@ class AuthService {
     }
   }
 
-  Future<void> signOut() => _auth.signOut();
+  Future<void> signOut() async {
+    if (!isFirebaseReady) return;
+    await _auth.signOut();
+  }
 
   // ---- LOGIN ----
   Future<UserCredential> signInEmailPassword(String email, String password) async {
-    try {
-      final cred = await _auth.signInWithEmailAndPassword(
-        email: email,
-        password: password,
+    if (!isFirebaseReady) {
+      throw StateError(
+        'Firebase não configurado. Adicione google-services.json para usar o login.',
       );
-      await _ensureUserDoc(cred.user!);
-      return cred;
-    } on FirebaseAuthException catch (e) {
-      if (e.code == 'user-not-found') {
-        // opcional: criar conta automaticamente se desejar
-        final cred = await _auth.createUserWithEmailAndPassword(
-          email: email,
-          password: password,
-        );
-        await cred.user!.updateDisplayName(email.split('@').first);
-        await _ensureUserDoc(cred.user!);
-        return cred;
-      }
-      rethrow;
     }
+    final cred = await _auth.signInWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
+    await _ensureUserDoc(cred.user!);
+    return cred;
+  }
+
+  static String friendlyError(Object error) {
+    if (error is StateError) {
+      return error.message;
+    }
+    if (error is FirebaseAuthException) {
+      switch (error.code) {
+        case 'invalid-credential':
+          return 'E-mail ou senha incorretos.';
+        case 'user-not-found':
+          return 'Usuário não encontrado. Crie uma conta para continuar.';
+        case 'wrong-password':
+          return 'Senha incorreta.';
+        case 'email-already-in-use':
+          return 'Este e-mail já está em uso.';
+        case 'weak-password':
+          return 'A senha é muito fraca. Use pelo menos 6 caracteres.';
+        case 'invalid-email':
+          return 'E-mail inválido.';
+        case 'too-many-requests':
+          return 'Muitas tentativas. Aguarde alguns instantes e tente novamente.';
+        case 'network-request-failed':
+          return 'Sem conexão com a internet. Verifique sua rede.';
+        default:
+          return error.message ?? 'Erro na autenticação (${error.code}).';
+      }
+    }
+    return 'Erro inesperado: $error';
   }
 
   // ---- SIGNUP ----
@@ -54,6 +81,11 @@ class AuthService {
     required String password,
     String? name,
   }) async {
+    if (!isFirebaseReady) {
+      throw StateError(
+        'Firebase não configurado. Adicione google-services.json para criar conta.',
+      );
+    }
     final cred = await _auth.createUserWithEmailAndPassword(
       email: email,
       password: password,
@@ -69,11 +101,17 @@ class AuthService {
 
   // ---- RESET PASSWORD ----
   Future<void> sendPasswordReset({required String email}) async {
+    if (!isFirebaseReady) {
+      throw StateError(
+        'Firebase não configurado. Adicione google-services.json para redefinir a senha.',
+      );
+    }
     await _auth.sendPasswordResetEmail(email: email);
   }
 
   // ---- PROFILE ----
   Future<void> updateProfile({required String name}) async {
+    if (!isFirebaseReady) return;
     final u = _auth.currentUser;
     if (u == null) return;
     await u.updateDisplayName(name);

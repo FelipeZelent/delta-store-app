@@ -67,11 +67,27 @@ class _OrderCard extends StatelessWidget {
                 child: Row(children: [
                   ClipRRect(
                     borderRadius: BorderRadius.circular(10),
-                    child: Image.network(it.image, width: 48, height: 48, fit: BoxFit.cover),
+                    child: Image.network(
+                      it.image,
+                      width: 48,
+                      height: 48,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, _, _) => Container(
+                        width: 48,
+                        height: 48,
+                        color: const Color(0xFF25262B),
+                        alignment: Alignment.center,
+                        child: const Icon(
+                          Icons.image_not_supported_outlined,
+                          color: Colors.white54,
+                          size: 20,
+                        ),
+                      ),
+                    ),
                   ),
                   const SizedBox(width: 10),
                   Expanded(child: Text('${it.title} · Tam ${it.size} · x${it.qty}', maxLines: 1, overflow: TextOverflow.ellipsis)),
-                  Text(brl((it.priceDouble * it.qty).round() * 100 ~/ 1), style: TextStyle(color: cs.primary, fontWeight: FontWeight.w700)),
+                  Text(brl((it.priceDouble * it.qty * 100).round()), style: TextStyle(color: cs.primary, fontWeight: FontWeight.w700)),
                 ]),
               )),
           const Divider(),

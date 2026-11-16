@@ -8,6 +8,7 @@ class Product {
   final List<String> sizes;
   final String description;
   final String categoryId;
+  final bool exists;
 
   const Product({
     required this.id,
@@ -17,10 +18,13 @@ class Product {
     required this.sizes,
     required this.description,
     required this.categoryId,
+    this.exists = true,
   });
 
   String get imageUrl =>
-      images.isNotEmpty ? images.first : 'https://via.placeholder.com/600x600?text=Produto';
+      images.isNotEmpty
+          ? images.first
+          : 'https://placehold.co/600x600/1A1B1E/FFFFFF/png?text=Produto';
 
   factory Product.fromDoc(DocumentSnapshot<Map<String, dynamic>> doc) {
     final data = doc.data() ?? {};
@@ -35,6 +39,7 @@ class Product {
       sizes: (data['sizes'] as List?)?.map((e) => e.toString()).toList() ?? const [],
       description: (data['description'] ?? '').toString(),
       categoryId: doc.reference.parent.parent?.id ?? '',
+      exists: doc.exists,
     );
   }
 }

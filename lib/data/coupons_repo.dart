@@ -9,7 +9,7 @@ class Coupon {
 class CouponsRepo {
   CouponsRepo._();
   static final instance = CouponsRepo._();
-  final _db = FirebaseFirestore.instance;
+  FirebaseFirestore get _db => FirebaseFirestore.instance;
 
   Future<Coupon?> getByCode(String code) async {
     final c = code.trim();

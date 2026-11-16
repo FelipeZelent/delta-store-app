@@ -55,7 +55,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                     icon: Icon(isFav ? Icons.favorite : Icons.favorite_border),
                     onPressed: () async {
                       await FavoritesRepo.instance.toggle(u.uid, p);
-                      if (!mounted) return;
+                      if (!context.mounted) return;
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text(
@@ -81,7 +81,19 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
               borderRadius: BorderRadius.circular(16),
               child: AspectRatio(
                 aspectRatio: 1,
-                child: Image.network(p.imageUrl, fit: BoxFit.cover),
+                child: Image.network(
+                  p.imageUrl,
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, _, _) => Container(
+                    color: const Color(0xFF25262B),
+                    alignment: Alignment.center,
+                    child: const Icon(
+                      Icons.image_not_supported_outlined,
+                      color: Colors.white54,
+                      size: 48,
+                    ),
+                  ),
+                ),
               ),
             ),
             const SizedBox(height: 16),
@@ -158,11 +170,11 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                         return;
                       }
                       await CartRepo.instance.addOrInc(
-                        uid: u!.uid,
+                        uid: u.uid,
                         product: p,
                         size: size!,
                       );
-                      if (!mounted) return;
+                      if (!context.mounted) return;
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(content: Text('Adicionado ao carrinho (tam $size)')),
                       );
